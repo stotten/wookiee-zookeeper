@@ -22,11 +22,19 @@ import akka.actor.Actor
 import akka.util.Timeout
 import org.apache.curator.x.discovery.UriSpec
 
-import scala.concurrent.Future
-
 /**
  * @author Michael Cuthbert on 7/9/15.
  */
+
+object DiscoverableType extends Enumeration {
+  type DiscoverableType = Value
+  val Akka, Avro = Value
+
+  val akkaPrefix = "akka.tcp://server@"
+  val avroPrefix = "akka.tcp://server@"
+
+}
+
 trait Discoverable {
   this: Actor =>
 
@@ -45,9 +53,10 @@ trait Discoverable {
       case "127.0.0.1" | "localhost" | "0.0.0.0" => (None, "[SERVER]")
       case a => (Some(a), a)
     }
+    val pathPrefix =
     service.makeDiscoverable(basePath, id, name, add._1,
       port,
-      new UriSpec(s"akka.tcp://server@${add._2}:$port/$name")
+      new UriSpec(s"$pathPrefix${add._2}:$port/$name")
     )
   }
 
